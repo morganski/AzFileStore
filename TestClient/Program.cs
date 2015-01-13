@@ -21,7 +21,7 @@ namespace TestClient
             {
                 using (var writer = new StreamWriter(stream))
                 {
-                    writer.WriteLine("Hello there, this is a test");
+                    writer.WriteLine("<HTML><BODY>Clucking bell!</BODY></HTML>");
                     writer.Flush();
                 }
             }
@@ -29,14 +29,14 @@ namespace TestClient
             using (var stream = new FileStream(filename, FileMode.Open))
             {
                 // Stuff a file into the store...
-                store.StoreFile("jim.txt", stream);
+                store.StoreFile(FILENAME, stream);
             }
 
             // Get a list of files in the store...
             var filenames = store.GetFilenames();
 
             // And get a specific file...
-            using (var stream = store.GetFile("jim.txt"))
+            using (var stream = store.GetFile(FILENAME))
             {
                 using (var reader = new StreamReader(stream))
                 {
@@ -44,6 +44,9 @@ namespace TestClient
                 }
             }
 
+            var uri = store.GetSecureFileUri(FILENAME);
         }
+
+        const string FILENAME = "jim.htm";
     }
 }
