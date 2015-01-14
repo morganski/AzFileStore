@@ -83,7 +83,7 @@ We could expose further methods to the caller by altering security on the contai
 
 ## Auditing Access
 
-Whilst we cannot verify that a user read a document, we could audit all interactions with a document so as to provide an audit trail of who has downloaded what. By wrapping the file container service in an AuditedFileContainerService we could then record all file accesses, whether read or write. We’d use Thread.CurrentPrincipal to identify the user, and use this to record access. In addition to the user it would also be worthwhile logging a timestamp which could be used to order the file access results when displayed to a user.
+Whilst we cannot verify that a user actually reads any document that they download on their computer, we could audit all interactions with a document so as to provide an audit trail of who has downloaded what. By wrapping the file container service in an AuditedFileContainerService we could then record all file accesses, whether read or write. We’d use Thread.CurrentPrincipal to identify the user, and use this to record access. In addition to the user it would also be worthwhile logging a timestamp which could be used to order the file access results when displayed to a user.
 This would no doubt be a worthwhile addition from a regulatory standpoint, as this would record exactly who had been granted access to a specific file.
 
 
