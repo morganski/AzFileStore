@@ -7,7 +7,7 @@ namespace FileStorageSpike.Interfaces
     /// <summary>
     /// Interface used to abstract storage of files
     /// </summary>
-    public interface IFileStore
+    public interface IFileContainer
     {
         /// <summary>
         /// Get a file given its filename
@@ -21,7 +21,8 @@ namespace FileStorageSpike.Interfaces
         /// </summary>
         /// <param name="filename">The name of the file</param>
         /// <param name="fileContent">The content of that file</param>
-        void StoreFile(string filename, Stream fileContent);
+        /// <param name="contentType">Defines the MIME type of the content</param>
+        void StoreFile(string filename, Stream fileContent, string contentType);
 
         /// <summary>
         /// Return a collection of filenames from this file store

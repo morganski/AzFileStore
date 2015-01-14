@@ -13,7 +13,7 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
-            var store = new AzureFileStore(ConfigurationManager.ConnectionStrings["azure"].ConnectionString, "sausage");
+            var store = new AzureFileContainer(ConfigurationManager.ConnectionStrings["azure"].ConnectionString, "sausage");
 
             string filename = Path.GetTempFileName();
 
@@ -29,7 +29,7 @@ namespace TestClient
             using (var stream = new FileStream(filename, FileMode.Open))
             {
                 // Stuff a file into the store...
-                store.StoreFile(FILENAME, stream);
+                store.StoreFile(FILENAME, stream, "text/html");
             }
 
             // Get a list of files in the store...

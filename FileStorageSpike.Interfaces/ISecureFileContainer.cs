@@ -2,7 +2,7 @@
 
 namespace FileStorageSpike.Interfaces
 {
-    public interface ISecureFileStore : IFileStore
+    public interface ISecureFileContainer : IFileContainer
     {
         /// <summary>
         /// Returns a URI that permits read only access to the file for a limited period of time

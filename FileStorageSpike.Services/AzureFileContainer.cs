@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace FileStorageSpike.Services
 {
-    public class AzureFileStore : ISecureFileStore
+    public class AzureFileContainer : ISecureFileContainer
     {
-        public AzureFileStore(string connectionString, string containerName)
+        public AzureFileContainer(string connectionString, string containerName)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             var blobClient = account.CreateCloudBlobClient();
@@ -40,10 +40,13 @@ namespace FileStorageSpike.Services
         /// </summary>
         /// <param name="filename">The name of the file</param>
         /// <param name="fileContent">The content of that file</param>
-        public void StoreFile(string filename, Stream fileContent)
+        /// <param name="contentType">Defines the MIME type of the content</param>
+        public void StoreFile(string filename, Stream fileContent, string contentType)
         {
             var blockBlob = _container.GetBlockBlobReference(filename);
             blockBlob.UploadFromStream(fileContent);
+            blockBlob.Properties.ContentType = contentType;
+            blockBlob.SetProperties();
         }
 
         /// <summary>
@@ -73,8 +76,7 @@ namespace FileStorageSpike.Services
 
             var constraints = new SharedAccessBlobPolicy
             {
-                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-1),
-                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(4),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10),
                 Permissions = SharedAccessBlobPermissions.Read
             };
 
