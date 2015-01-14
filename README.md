@@ -4,6 +4,8 @@ When taking out a loan a customer may need to provide several items of data to s
 
 These documents, together with any others that may be produced internally can be stored together as a unit and recalled at will. A pictorial representation of an application is shown below…
 
+![File Storage](https://raw.githubusercontent.com/morganski/AzFileStore/master/DS01.png)
+
 There is no inherent structure here, it’s basically a simple collection of files as I don’t see the need to have a large unwieldy structure (i.e. set of directories) for an application. If we did want to segregate files we might well break these down into two containers, one accessible by the end user and another that is internal to us. The files are still associated with one application, but we might choose to split these into two separate containers. That makes security much easier too, as we can create one container just for user accessible data and lock the other down completely.
 ## The API
 We need a mechanism where we can store and retrieve files, so I came up with the simplest interface I could think of for this…
@@ -33,9 +35,9 @@ I’ve deliberately included the word “secure” here to indicate to the user 
 I have created an implementation of both interfaces using Windows Azure which can be used as an exemplar. We could also implement one using S3 and, should we wish to, one using a file system – however using the latter we’d also need to write the security aspects of it too, which Azure already does for us.
 The AzureFileContainer class contains a constructor as follows…
 
-    public AzureFileContainer(string connectionString, string containerName)
+    public AzureFileContainer(string connectionString, string containerName, TimeSpan fileShareDuration)
 
-The connection string contains the details used to connect to Windows Azure, and the container name would be a unique string – I’d suggest it was the application Id we use in our other systems.
+The connection string contains the details used to connect to Windows Azure, and the container name would be a unique string – I’d suggest it was the application Id we use in our other systems. Lastly the fileShareDuration defines how long a link will be valid.
 We would expose this container in Autofac as a dependency so that it could be imported as follows…
 
     Func<string, ISecureFileContainer>
@@ -81,7 +83,7 @@ We could expose further methods to the caller by altering security on the contai
 
 ## Auditing Access
 
-Whilst we cannot verify that a user read a document, we could audit all interactions with a document so as to provide an audit trail of who has downloaded what. By wrapping the file container service in an AuditedFileContainerService we could then record all file accesses, whether read or write. We’d use Thread.CurrentPrincipal to identify the user, and use this to record access. In addition to the user it would also be worthwhile logging a timestamp which could be used to order the file access results when displayed to a user.
+Whilst we cannot verify that a user actually reads any document that they download on their computer, we could audit all interactions with a document so as to provide an audit trail of who has downloaded what. By wrapping the file container service in an AuditedFileContainerService we could then record all file accesses, whether read or write. We’d use Thread.CurrentPrincipal to identify the user, and use this to record access. In addition to the user it would also be worthwhile logging a timestamp which could be used to order the file access results when displayed to a user.
 This would no doubt be a worthwhile addition from a regulatory standpoint, as this would record exactly who had been granted access to a specific file.
 
 
