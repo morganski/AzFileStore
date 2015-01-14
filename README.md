@@ -63,11 +63,15 @@ The AzureFileContainer implements the GetSecureFileUri as shown below…
 
 This method retrieves the reference to the file and then creates a security policy that provides time limited access to the file via a dependency (defined as a timespan). The form of URI returned is shown below…
 
-    http://127.0.0.1:10000/devstoreaccount1/sausage/jim.htm?sv=2014-02-14&sr=b&sig=9gBjxDk4JWweZgohNCZMXj3f34JF4pgT8lS%2FtIRR1KI%3D&se=2015-01-14T14%3A26%3A09Z&sp=r
+    http://127.0.0.1:10000/devstoreaccount1/sausage/jim.htm?
+    sv=2014-02-14&sr=b&sig=9gBjxDk4JWweZgohNCZMXj3f34JF4pgT8lS%2FtIRR1KI%3D
+    &se=2015-01-14T14%3A26%3A09Z&sp=r
 
 Here I’m using a local Azure storage account – a remote account URI is as follows…
 
-    https://somethingorother.blob.core.windows.net/sausage/jim.htm?sv=2014-02-14&sr=b&sig=mW1WxAghZ5CfsSbNF7M3E0eTNfMLXLkt2K0qg180Jk8%3D&se=2015-01-14T14%3A34%3A52Z&sp=r
+    https://somethingorother.blob.core.windows.net/sausage/jim.htm?
+    sv=2014-02-14&sr=b&sig=mW1WxAghZ5CfsSbNF7M3E0eTNfMLXLkt2K0qg180Jk8%3D
+    &se=2015-01-14T14%3A34%3A52Z&sp=r
 
 Note that both the container name (in this case sausage) and the filename (jim.htm) are exposed to the caller. If a request is made to retrieve the container (i.e. by removing jim.htm above and all subsequent URL parameters) then Azure will respond with an error…
 
