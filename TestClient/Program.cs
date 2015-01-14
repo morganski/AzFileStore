@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TestClient
@@ -15,6 +17,8 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+
             var container = BuildContainer();
 
             var containerFunc = container.Resolve<Func<string, ISecureFileContainer>>();
@@ -60,15 +64,25 @@ namespace TestClient
             var builder = new ContainerBuilder();
 
             builder.RegisterType<AzureFileContainer>()
-                .As<IFileContainer, ISecureFileContainer>()
+                .Named<ISecureFileContainer>("wrapped")
                 .WithParameter("connectionString", ConfigurationManager.ConnectionStrings["azure"].ConnectionString)
                 .WithParameter("fileShareDuration", TimeSpan.FromMinutes(1));   // Only set this up for development, would expect a longer duration!
+
+            builder.RegisterType<AuditedFileContainer>()
+                .As<ISecureFileContainer, IFileContainer>();
+
+            builder.RegisterType<ConsoleAudit>()
+                .As<IAudit>();
 
             builder.Register<Func<string, ISecureFileContainer>>(cc =>
             {
                 var context = cc.Resolve<IComponentContext>();
 
-                return (containerName) => context.Resolve<ISecureFileContainer>(new NamedParameter("containerName", containerName));
+                return (containerName) =>
+                {
+                    var wrapped = context.ResolveNamed<ISecureFileContainer>("wrapped", new NamedParameter("containerName", containerName));
+                    return context.Resolve<ISecureFileContainer>(new TypedParameter(typeof(ISecureFileContainer), wrapped));
+                };
             });
 
             return builder.Build();
