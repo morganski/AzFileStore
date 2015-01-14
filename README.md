@@ -35,9 +35,9 @@ I’ve deliberately included the word “secure” here to indicate to the user 
 I have created an implementation of both interfaces using Windows Azure which can be used as an exemplar. We could also implement one using S3 and, should we wish to, one using a file system – however using the latter we’d also need to write the security aspects of it too, which Azure already does for us.
 The AzureFileContainer class contains a constructor as follows…
 
-    public AzureFileContainer(string connectionString, string containerName)
+    public AzureFileContainer(string connectionString, string containerName, TimeSpan fileShareDuration)
 
-The connection string contains the details used to connect to Windows Azure, and the container name would be a unique string – I’d suggest it was the application Id we use in our other systems.
+The connection string contains the details used to connect to Windows Azure, and the container name would be a unique string – I’d suggest it was the application Id we use in our other systems. Lastly the fileShareDuration defines how long a link will be valid.
 We would expose this container in Autofac as a dependency so that it could be imported as follows…
 
     Func<string, ISecureFileContainer>
