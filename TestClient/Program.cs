@@ -1,4 +1,6 @@
-﻿using FileStorageSpike.Services;
+﻿using Autofac;
+using FileStorageSpike.Interfaces;
+using FileStorageSpike.Services;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,7 +15,13 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
-            var store = new AzureFileContainer(ConfigurationManager.ConnectionStrings["azure"].ConnectionString, "sausage");
+            var container = BuildContainer();
+
+            var containerFunc = container.Resolve<Func<string, ISecureFileContainer>>();
+
+            var store = containerFunc("sausage");
+
+            //var store = new AzureFileContainer(ConfigurationManager.ConnectionStrings["azure"].ConnectionString, "sausage");
 
             string filename = Path.GetTempFileName();
 
@@ -47,6 +55,27 @@ namespace TestClient
             var uri = store.GetSecureFileUri(FILENAME);
         }
 
+        static IContainer BuildContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.RegisterType<AzureFileContainer>()
+                .As<IFileContainer, ISecureFileContainer>()
+                .WithParameter("connectionString", ConfigurationManager.ConnectionStrings["azure"].ConnectionString)
+                .WithParameter("fileShareDuration", TimeSpan.FromMinutes(1));   // Only set this up for development, would expect a longer duration!
+
+            builder.Register<Func<string, ISecureFileContainer>>(cc =>
+            {
+                var context = cc.Resolve<IComponentContext>();
+
+                return (containerName) => context.Resolve<ISecureFileContainer>(new NamedParameter("containerName", containerName));
+            });
+
+            return builder.Build();
+        }
+
         const string FILENAME = "jim.htm";
     }
+
+
 }

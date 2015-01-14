@@ -12,13 +12,14 @@ namespace FileStorageSpike.Services
 {
     public class AzureFileContainer : ISecureFileContainer
     {
-        public AzureFileContainer(string connectionString, string containerName)
+        public AzureFileContainer(string connectionString, string containerName, TimeSpan fileShareDuration)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             var blobClient = account.CreateCloudBlobClient();
             _container = blobClient.GetContainerReference(containerName);
             _container.CreateIfNotExists();
             _container.SetPermissions(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Off });
+            _fileShareDuration = fileShareDuration;
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace FileStorageSpike.Services
 
             var constraints = new SharedAccessBlobPolicy
             {
-                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10),
+                SharedAccessExpiryTime = DateTime.UtcNow.Add(_fileShareDuration),
                 Permissions = SharedAccessBlobPermissions.Read
             };
 
@@ -85,7 +86,7 @@ namespace FileStorageSpike.Services
             return new Uri(blockBlob.Uri, token);
         }
 
-
+        private TimeSpan _fileShareDuration;
         private CloudBlobContainer _container;
     }
 }
