@@ -67,6 +67,7 @@
     <Compile Include="AuditedFileContainer.cs" />
     <Compile Include="AzureFileContainer.cs" />
     <Compile Include="ConsoleAudit.cs" />
+    <Compile Include="DocumentContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

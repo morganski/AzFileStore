@@ -39,8 +39,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventType.cs" />
     <Compile Include="IAudit.cs" />
+    <Compile Include="IDocumentAuditor.cs" />
+    <Compile Include="IDocumentContainer.cs" />
     <Compile Include="IFileContainer.cs" />
+    <Compile Include="IFilenameGenerator.cs" />
     <Compile Include="ISecureFileContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

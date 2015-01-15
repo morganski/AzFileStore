@@ -21,8 +21,8 @@ namespace FileStorageSpike.Interfaces
         /// </summary>
         /// <param name="filename">The name of the file</param>
         /// <param name="fileContent">The content of that file</param>
-        /// <param name="contentType">Defines the MIME type of the content</param>
-        void StoreFile(string filename, Stream fileContent, string contentType);
+        /// <param name="mimeType">Defines the MIME type of the content</param>
+        void StoreFile(string filename, Stream fileContent, string mimeType);
 
         /// <summary>
         /// Return a collection of filenames from this file store

@@ -31,10 +31,10 @@ namespace FileStorageSpike.Services
             return _wrappedContainer.GetFile(filename);
         }
 
-        public void StoreFile(string filename, Stream fileContent, string contentType)
+        public void StoreFile(string filename, Stream fileContent, string mimeType)
         {
-            _audit.RecordOperation(Thread.CurrentPrincipal, "Store file '{0}' of type '{1}'", filename, contentType);
-            _wrappedContainer.StoreFile(filename, fileContent, contentType);
+            _audit.RecordOperation(Thread.CurrentPrincipal, "Store file '{0}' of type '{1}'", filename, mimeType);
+            _wrappedContainer.StoreFile(filename, fileContent, mimeType);
         }
 
         public IEnumerable<string> GetFilenames()

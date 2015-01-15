@@ -41,12 +41,12 @@ namespace FileStorageSpike.Services
         /// </summary>
         /// <param name="filename">The name of the file</param>
         /// <param name="fileContent">The content of that file</param>
-        /// <param name="contentType">Defines the MIME type of the content</param>
-        public void StoreFile(string filename, Stream fileContent, string contentType)
+        /// <param name="mimeType">Defines the MIME type of the content</param>
+        public void StoreFile(string filename, Stream fileContent, string mimeType)
         {
             var blockBlob = _container.GetBlockBlobReference(filename);
             blockBlob.UploadFromStream(fileContent);
-            blockBlob.Properties.ContentType = contentType;
+            blockBlob.Properties.ContentType = mimeType;
             blockBlob.SetProperties();
         }
 
