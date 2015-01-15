@@ -21,11 +21,9 @@ namespace TestClient
 
             var container = BuildContainer();
 
-            var containerFunc = container.Resolve<Func<string, ISecureFileContainer>>();
+            var containerFunc = container.Resolve<Func<string, IDocumentContainer>>();
 
             var store = containerFunc("sausage");
-
-            //var store = new AzureFileContainer(ConfigurationManager.ConnectionStrings["azure"].ConnectionString, "sausage");
 
             string filename = Path.GetTempFileName();
 
@@ -38,25 +36,19 @@ namespace TestClient
                 }
             }
 
+            string storedFilename = null;
+
             using (var stream = new FileStream(filename, FileMode.Open))
             {
                 // Stuff a file into the store...
-                store.StoreFile(FILENAME, stream, "text/html");
+                storedFilename = store.StoreDocument(stream, "text/html", "A random file");
             }
 
             // Get a list of files in the store...
-            var filenames = store.GetFilenames();
+            var filenames = store.GetDocumentNames();
 
-            // And get a specific file...
-            using (var stream = store.GetFile(FILENAME))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    var content = reader.ReadToEnd();
-                }
-            }
-
-            var uri = store.GetSecureFileUri(FILENAME);
+            // Now get the file URI...
+            var uri = store.GetDocumentUri(storedFilename);
         }
 
         static IContainer BuildContainer()
@@ -64,26 +56,35 @@ namespace TestClient
             var builder = new ContainerBuilder();
 
             builder.RegisterType<AzureFileContainer>()
-                .Named<ISecureFileContainer>("wrapped")
+                .As<IFileContainer, ISecureFileContainer>()
                 .WithParameter("connectionString", ConfigurationManager.ConnectionStrings["azure"].ConnectionString)
                 .WithParameter("fileShareDuration", TimeSpan.FromMinutes(1));   // Only set this up for development, would expect a longer duration!
 
-            builder.RegisterType<AuditedFileContainer>()
-                .As<ISecureFileContainer, IFileContainer>();
-
-            builder.RegisterType<ConsoleAudit>()
-                .As<IAudit>();
+            builder.RegisterType<DocumentContainer>()
+                .As<IDocumentContainer>();
 
             builder.Register<Func<string, ISecureFileContainer>>(cc =>
             {
                 var context = cc.Resolve<IComponentContext>();
 
-                return (containerName) =>
-                {
-                    var wrapped = context.ResolveNamed<ISecureFileContainer>("wrapped", new NamedParameter("containerName", containerName));
-                    return context.Resolve<ISecureFileContainer>(new TypedParameter(typeof(ISecureFileContainer), wrapped));
-                };
+                return containerName => context.Resolve<ISecureFileContainer>(new NamedParameter("containerName", containerName));
             });
+
+            builder.Register<Func<string, IDocumentContainer>>(cc =>
+            {
+                var context = cc.Resolve<IComponentContext>();
+
+                return containerName => context.Resolve<IDocumentContainer>(new NamedParameter("containerName", containerName));
+            });
+
+            builder.RegisterType<FilenameGenerator>()
+                .As<IFilenameGenerator>();
+
+            builder.RegisterType<ConsoleDocumentAuditor>()
+                .As<IDocumentAuditor>();
+
+            builder.RegisterType<FilenameGenerator>()
+                .As<IFilenameGenerator>();
 
             return builder.Build();
         }
